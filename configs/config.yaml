@@ -1,0 +1,187 @@
+# Configuration for Advanced Fraud Detection Platform
+
+pipeline:
+  test_size: 0.2
+  validation_split: 0.1
+  random_state: 42
+  batch_size: 1024
+  early_stopping_rounds: 50
+  max_epochs: 100
+
+data:
+  path: "data/raw/transactions.csv"
+  target_col: "is_fraud"
+  user_col: "user_id"
+  merchant_col: "merchant_id"
+  amount_col: "amount"
+  time_col: "timestamp"
+  
+  expected_columns:
+    - user_id
+    - merchant_id
+    - amount
+    - timestamp
+    - is_fraud
+  
+  exclude_cols:
+    - user_id
+    - merchant_id
+    - transaction_id
+    - timestamp
+
+features:
+  graph: true
+  temporal: true
+  aggregations: true
+  
+  graph_params:
+    compute_centrality: true
+    detect_communities: true
+    clustering_coefficient: true
+  
+  temporal_params:
+    hour_of_day: true
+    day_of_week: true
+    month: false
+    is_weekend: true
+
+model:
+  type: "xgboost"  # Options: xgboost, lightgbm, catboost, random_forest, tabnet
+  
+  xgboost_params:
+    n_estimators: 500
+    learning_rate: 0.01
+    max_depth: 6
+    min_child_weight: 3
+    gamma: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    scale_pos_weight: 10  # Handle class imbalance
+    objective: "binary:logistic"
+    eval_metric: "auc"
+    use_label_encoder: false
+    random_state: 42
+    n_jobs: -1
+  
+  lightgbm_params:
+    n_estimators: 500
+    learning_rate: 0.01
+    max_depth: -1
+    num_leaves: 31
+    min_child_samples: 20
+    subsample: 0.8
+    colsample_bytree: 0.8
+    scale_pos_weight: 10
+    objective: "binary"
+    metric: "auc"
+    random_state: 42
+    n_jobs: -1
+  
+  catboost_params:
+    iterations: 500
+    learning_rate: 0.01
+    depth: 6
+    loss_function: "Logloss"
+    eval_metric: "AUC"
+    scale_pos_weight: 10
+    random_state: 42
+    verbose: 0
+  
+  rf_params:
+    n_estimators: 200
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    class_weight: "balanced"
+    random_state: 42
+    n_jobs: -1
+  
+  tabnet_params:
+    n_d: 16
+    n_a: 16
+    n_steps: 5
+    gamma: 1.5
+    lambda_sparse: 0.001
+    optimizer_fn: "torch.optim.Adam"
+    optimizer_params:
+      lr: 0.02
+      weight_decay: 1.0e-5
+    scheduler_params:
+      mode: "min"
+      patience: 10
+      factor: 0.5
+      min_lr: 1.0e-6
+    seed: 42
+    verbose: 1
+
+anomaly_detection:
+  enabled: true
+  models:
+    - isolation_forest
+    - autoencoder
+    - one_class_svm
+  
+  isolation_forest_params:
+    n_estimators: 200
+    contamination: 0.01
+    max_samples: "auto"
+    random_state: 42
+  
+  autoencoder_params:
+    latent_dim: 16
+    hidden_dims: [128, 64, 32]
+    epochs: 100
+    batch_size: 256
+    learning_rate: 0.001
+    beta: 1.0
+
+federated_learning:
+  enabled: false
+  num_clients: 5
+  rounds: 10
+  fraction_fit: 0.8
+  fraction_evaluate: 1.0
+  strategy: "fedavg"
+
+monitoring:
+  enabled: true
+  drift_detection: true
+  metrics_tracking: true
+  
+  drift_params:
+    psi_threshold: 0.1
+    ks_alpha: 0.05
+    check_frequency: "daily"
+  
+  alert_thresholds:
+    accuracy_min: 0.90
+    recall_fraud_min: 0.80
+    precision_fraud_min: 0.70
+    f1_fraud_min: 0.75
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: true
+  log_level: "info"
+  
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst: 20
+
+artifacts:
+  models_dir: "models"
+  model_name: "fraud_detection_model.pkl"
+  metrics_file: "training_metrics.json"
+  mlflow_tracking_uri: "mlruns"
+  save_plots: true
+  save_predictions: true
+
+logging:
+  level: "INFO"
+  format: "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}"
+  file: "logs/training.log"
+  rotation: "1 day"
+  retention: "7 days"
