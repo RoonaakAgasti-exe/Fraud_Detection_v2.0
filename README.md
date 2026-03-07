@@ -1,11 +1,9 @@
-# 🛡️ Financial Fraud Detection Platform v1.0
+# 🛡️ Financial Fraud Detection Platform v2.0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![GitHub stars](https://img.shields.io/github/stars/danielandarge/financial-fraud-detection-model.svg?style=social&label=Star)](https://github.com/danielandarge/financial-fraud-detection-model)
-[![CI/CD](https://github.com/danielandarge/financial-fraud-detection-model/workflows/CI/CD/badge.svg)](.github/workflows/ci-cd.yml)
 
 **Advanced AI/ML fraud detection with deep learning, real-time streaming, and privacy-preserving capabilities.**
 
@@ -32,27 +30,27 @@
 
 ### 🧠 Deep Learning Models
 - **TabNet**: Attention-based tabular learning
-- **Transformers**: Sequential pattern recognition
-- **Graph Neural Networks (GNNs)**: Transaction network analysis
-- **Variational Autoencoders (VAEs)**: Anomaly detection
+- **Transformers**: Sequential pattern recognition for transaction series
+- **Graph Neural Networks (GNNs)**: Transaction network analysis using networkx and centrality
+- **Variational Autoencoders (VAEs)**: Unsupervised anomaly detection based on reconstruction error
 
 ### 🔒 Privacy-Preserving ML
-- **Federated Learning**: Decentralized model training
+- **Federated Learning**: Decentralized model training with Flower
 - **Differential Privacy**: Privacy guarantees with Opacus
 - **Homomorphic Encryption**: Encrypted inference with TenSEAL
 
 ### ⚡ Real-time Processing
 - **Kafka Streaming**: High-throughput event processing
-- **WebSocket Alerts**: Real-time fraud notifications
+- **WebSocket Alerts**: Real-time fraud notifications via FastAPI
 - **Redis Cache**: Low-latency data access
 
 ### 📊 Monitoring & Explainability
-- **Drift Detection**: Model performance monitoring with Evidently
-- **SHAP/LIME**: Model interpretability
+- **Drift Detection**: Model performance and data drift monitoring with Evidently
+- **SHAP Explanations**: Local model interpretability and feature importance
 - **Prometheus + Grafana**: Metrics visualization
 
 ### 🚀 Production-Ready
-- **FastAPI REST API**: High-performance endpoints
+- **FastAPI REST API**: High-performance endpoints for predictions and explanations
 - **Docker & Kubernetes**: Containerized deployment
 - **CI/CD Ready**: GitHub Actions workflows
 
@@ -63,7 +61,7 @@
 ### Prerequisites
 - Python 3.9 or higher
 - pip or poetry
-- Docker (optional, for containerized deployment)
+- Docker (optional)
 
 ### Clone the Repository
 ```bash
@@ -72,56 +70,27 @@ cd financial-fraud-detection-model
 ```
 
 ### Install Dependencies
-
-**Basic Installation:**
 ```bash
 pip install -r requirements.txt
-```
-
-**Using pip extras:**
-```bash
-# Install all features
-pip install -e ".[all]"
-
-# Install specific features
-pip install -e ".[deep-learning]"
-pip install -e ".[streaming]"
-pip install -e ".[privacy]"
-pip install -e ".[api]"
-pip install -e ".[monitoring]"
-```
-
-**Development Installation:**
-```bash
-pip install -e ".[all]"
-pip install pytest pytest-cov black isort mypy
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Setup Configuration
+### 1. Generate Synthetic Data
 ```bash
-# Copy example environment file
-cp .env.example .env
-
-# Edit configuration in configs/config.yaml
+python data/generate_data.py
 ```
 
 ### 2. Run Training Pipeline
 ```bash
-python pipelines/training_pipeline.py
+python pipelines/training_pipeline.py --config configs/config.yaml
 ```
 
 ### 3. Start API Server
 ```bash
 python -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 4. Deploy with Docker
-```bash
-docker-compose up -d
 ```
 
 Access the API docs at: `http://localhost:8000/docs`
@@ -134,30 +103,21 @@ Access the API docs at: `http://localhost:8000/docs`
 financial-fraud-detection-model/
 ├── src/                      # Core source code
 │   ├── data/                 # Data loaders and validators
-│   ├── features/             # Feature engineering
+│   ├── features/             # Graph and temporal feature engineering
 │   ├── models/               # Model architectures
-│   │   ├── classical/        # Traditional ML models
-│   │   ├── deep_learning/    # Deep learning models
-│   │   ├── anomaly/          # Anomaly detection
-│   │   └── ensemble/         # Ensemble methods
+│   │   ├── deep_learning/    # TabNet, Transformers
+│   │   └── anomaly/          # VAE, Isolation Forest
 │   ├── monitoring/           # Drift detection & monitoring
-│   ├── explainability/       # SHAP, LIME, Captum
-│   └── privacy/              # Federated learning & privacy
+│   ├── explainability/       # SHAP based explanations
+│   └── privacy/              # Federated learning logic
 ├── api/                      # FastAPI application
 ├── pipelines/                # Training pipelines
-├── configs/                  # Configuration files
-├── tests/                    # Test suites
-│   ├── unit/                 # Unit tests
-│   ├── integration/          # Integration tests
-│   └── performance/          # Performance tests
-├── deploy/                   # Deployment configurations
-│   ├── docker/               # Docker configurations
-│   └── k8s/                  # Kubernetes manifests
-├── examples/                 # Example notebooks & scripts
-├── docs/                     # Documentation
-├── .github/                  # GitHub workflows & templates
-├── requirements.txt          # All dependencies
-├── pyproject.toml           # Project metadata
+├── configs/                  # Configuration YAML files
+├── tests/                    # Unit and integration tests
+├── data/                     # Raw and processed data
+├── models/                   # Saved model artifacts
+├── logs/                     # System and training logs
+├── deploy/                   # Docker and K8s configurations
 └── README.md                # This file
 ```
 
